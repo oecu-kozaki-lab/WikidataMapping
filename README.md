@@ -1,0 +1,2 @@
+# WikidataMapping
+Wikdiata用のマッピングツール
