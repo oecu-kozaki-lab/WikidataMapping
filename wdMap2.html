@@ -24,7 +24,7 @@ window.addEventListener('load', () => {
 //検索に用いるSPARQLクエリを生成し，実行する
 async function makeQuery(){
     const endpoint = "https://query.wikidata.org/sparql";
-	let query = document.getElementById('query_area').value;
+	
     const resultArea = document.getElementById('result_div');
 
     const delailsArea = document.getElementById('details_div');
@@ -35,19 +35,21 @@ async function makeQuery(){
    
     const labels = textLABEL.split('\n');
     
-    for
+    for(let i=0;i<labels.length;i++){
+        let query = document.getElementById('query_area').value;
+        query = await makeMappingQuery(query,labels[i]);
+        document.getElementById('query_area2').value = query;
 
-    query = await makeMappingQuery(query,labels[1]);
-    document.getElementById('query_area2').value = query;
+        //SPARQLクエリの実行
+        dispLoading("検索中...");			
+        const resultData = await sendSPARQLQuery(endpoint, query);
+        removeLoading();
 
-    //SPARQLクエリの実行
-    dispLoading("検索中...");			
-	const resultData = await sendSPARQLQuery(endpoint, query);
-    removeLoading();
+        document.getElementById('result_box').style.display="flex";
+        document.getElementById('resjson_area').value = JSON.stringify(resultData,null,'  ');
+        showResult(resultData,resultArea); //クエリ結果の表示【テーブル表示用】
+    }
 
-    document.getElementById('result_box').style.display="flex";
-    document.getElementById('resjson_area').value = JSON.stringify(resultData,null,'  ');
-    showResult(resultData,resultArea); //クエリ結果の表示【テーブル表示用】
 }
 </script>
 </head>
