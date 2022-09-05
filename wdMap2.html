@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="style.css">
 <script src="KGSearch.js"></script>     <!-- KG検索用のライブラリ読み込み -->
 <script src="options.js"></script> <!-- KG検索設定ファイルの読み込み -->
+<script src="wdMapping.js"></script>     <!-- KG検索用のライブラリ読み込み -->
 
 <script>
 //詳細表示ページ用の設定
@@ -29,7 +30,14 @@ async function makeQuery(){
     const delailsArea = document.getElementById('details_div');
     delailsArea.innerHTML='<iframe src="" name="details"style="width: 400px; height: 80hv;"></iframe>';
 
-    query = await makeSPARQLquery(query);
+    //入力データの取得＋クエリ生成処理
+    const textLABEL = document.getElementById('LABELS').value;
+   
+    const labels = textLABEL.split('\n');
+    
+    for
+
+    query = await makeMappingQuery(query,labels[1]);
     document.getElementById('query_area2').value = query;
 
     //SPARQLクエリの実行
@@ -52,8 +60,9 @@ async function makeQuery(){
 <!-- 検索条件設定の領域 -->
 <div id="menu" class="container">
 	<div style="margin-top:4px;">
-        <b>Wikidata全体</b>の検索<br>
-		<input id="LABEL" type="text" value="" size="40"/>         
+        <b>Wikidata全体</b>の検索 for タクソン[wd:Q16521]<br>
+		<!-- <input id="LABEL" type="text" value="" size="40"/>   -->
+        <textarea id="LABELS" class="t_area" rows="20" ></textarea><br>       
         <input type="button" id="send" value="検索の実行" style="margin-top:8px; "><br>
 	<hr>
         <input type="button" id="showQueryCond" value="▼詳細検索条件">
@@ -82,13 +91,11 @@ async function makeQuery(){
         <textarea id="settings_area" class="t_area" rows="10" ></textarea><br>
         <b>置き換え前のクエリ</b>：<br>
 <textarea id="query_area" class="t_area" rows="10">
-select DISTINCT ?item ?itemLabel ?class ?super
+select DISTINCT ?item ?itemLabel
 where{
-    BIND(?opt1 AS ?class)
-    BIND(?opt2 AS ?super)
     SERVICE wikibase:label { bd:serviceParam wikibase:language "ja,en". }
 }
-LIMIT 50		            
+LIMIT 50		
 </textarea>
         <br>
         <b>置き換え後のクエリ</b>：<input type="button" value="WikidataでSPARQL検索" 

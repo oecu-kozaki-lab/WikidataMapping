@@ -2,16 +2,16 @@ let search_cond =
 [
   {
     "id": "cond1",
-    "ctext": " 分類[wdt:P31]＝タクソン",
+    "ctext": " 分類[wdt:P31] 例）wd:Q16521（タクソン），wd:Q746549（料理）",
     "cond": "wdt:P31",
-    "val": "wd:Q16521",
+    "val": "",
     "type": "ID",
-    "const": true
+    "const": false
   },
   {
     "id": "cond2",
-    "ctext": "",
-    "cond": "",
+    "ctext": "上位クラス 例）\twd:Q746549（料理）",
+    "cond": "wdt:P279",
     "val": "",
     "type": "ID",
     "const": false
@@ -46,15 +46,15 @@ let search_prop =
 [
   {
     "id": "opt1",
-    "prop": "",
-    "pname": "",
-    "optional": false
+    "prop": "wdt:P31",
+    "pname": "分類",
+    "optional": true
   },
   {
     "id": "opt2",
-    "prop": "",
-    "pname": "",
-    "optional": false
+    "prop": "wdt:P279",
+    "pname": "上位クラス",
+    "optional": true
   },
   {
     "id": "opt3",
