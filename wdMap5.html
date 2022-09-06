@@ -34,20 +34,55 @@ async function makeQuery(){
     const textLABEL = document.getElementById('LABELS').value;
    
     const labels = textLABEL.split('\n');
-    
+    const modes = ["LabelFull","LabelForward","LabelAmbi"];
+
     for(let i=0;i<labels.length;i++){
-        let query = document.getElementById('query_area').value;
-        query = await makeMappingQuery(query,labels[i]);
-        document.getElementById('query_area2').value = query;
+        const uriLbl = labels[i].split('\t');
+        console.log('uri='+uriLbl[0]+'label='+uriLbl[1]+' searching...');
+        let m=0
+        for(m=0;m<modes.length;m++){      
+            if(uriLbl[1]==undefined){
+                console.log('undefinedでスキップ');
+                break;
+            }
+            let query = document.getElementById('query_area').value;  
+            query = await makeMappingQuery2(query,uriLbl[0],uriLbl[1],modes[m]);
+            document.getElementById('query_area2').value = query;
 
-        //SPARQLクエリの実行
-        dispLoading("検索中...");			
-        const resultData = await sendSPARQLQuery(endpoint, query);
-        removeLoading();
+            //SPARQLクエリの実行
+            dispLoading("検索中...");			
+            const resultData = await sendSPARQLQuery(endpoint, query);
+            removeLoading();
 
-        document.getElementById('result_box').style.display="flex";
-        document.getElementById('resjson_area').value = JSON.stringify(resultData,null,'  ');
-        showResult(resultData,resultArea); //クエリ結果の表示【テーブル表示用】
+            document.getElementById('result_box').style.display="flex";
+            document.getElementById('resjson_area').value = JSON.stringify(resultData,null,'  ');
+            
+            if(resultData.results.bindings.length>0){
+                //showResult(resultData,resultArea); //クエリ結果の表示【テーブル表示用】
+                console.log('label='+uriLbl[1]+' mode='+modes[m]+'...OK!');
+                showResultORG(resultData,resultArea); //クエリ結果の表示【テーブル表示用(結合無し)】
+                break;
+            }
+            //removeSearchIng();
+            //console.log('label='+uriLbl[1]+' mode='+modes[m]+'...NOT FOUNDED');
+            if(m==2){                
+                var new_data  =  {
+                        "uri": {
+                                "value": "URI"
+                            },
+                            "lbl": {
+                            "value": "TEST"
+                            }
+                        };
+                new_data["uri"].value = uriLbl[0];
+                new_data["lbl"].value = uriLbl[1];
+                
+                resultData.results.bindings.push(new_data);
+                console.log('label='+uriLbl[1]+' mode='+modes[m]+'...NOT FOUNDED...');
+                showResultORG(resultData,resultArea); //クエリ結果の表示【テーブル表示用(結合無し)】
+            }   
+        }
+              
     }
 
 }
@@ -62,7 +97,8 @@ async function makeQuery(){
 <!-- 検索条件設定の領域 -->
 <div id="menu" class="container">
 	<div style="margin-top:4px;">
-        <b>Wikidata全体</b>の検索 for タクソン[wd:Q16521]<br>
+        <b>Wikidataとのマッピング</b><br>
+        1行ごとに「URI(TAB)ラベル」のテキストを貼り付けて【検索の実行】<br>
 		<!-- <input id="LABEL" type="text" value="" size="40"/>   -->
         <textarea id="LABELS" class="t_area" rows="20" ></textarea><br>       
         <input type="button" id="send" value="検索の実行" style="margin-top:8px; "><br>
@@ -93,14 +129,19 @@ async function makeQuery(){
         <textarea id="settings_area" class="t_area" rows="10" ></textarea><br>
         <b>置き換え前のクエリ</b>：<br>
 <textarea id="query_area" class="t_area" rows="10">
-select DISTINCT ?item ?itemLabel
+select DISTINCT ?uri ?lbl ?item ?itemLabel ?class ?classLabel ?super ?superLabel ?propLabel ?prop ?o
 where{
     {?item wdt:P31 wd:Q16521.}UNION
     {?item wdt:P279* wd:Q2095.}    
+OPTIONAL{?item wdt:P31 ?class.}
+OPTIONAL{?item wdt:P279 ?super .}
     SERVICE wikibase:label { bd:serviceParam wikibase:language "ja,en". }
+?item ?p ?o.
+?prop wikibase:directClaim ?p.
+?prop wdt:P31/wdt:P279* wd:Q18614948.
 }
 ORDER BY ?item
-LIMIT 50		
+LIMIT 50             
 </textarea>
         <br>
         <b>置き換え後のクエリ</b>：<input type="button" value="WikidataでSPARQL検索" 

@@ -62,7 +62,9 @@ async function sendWdQuery(endpoint,options){
     try {
 		const result = await sendGetQuery(endpoint,options);
         if (!result.ok) {
-			alert("sendWdQueryでクエリエラーが発生しました");
+			//alert("sendWdQueryでクエリエラーが発生しました");
+			console.log("sendWdQueryでクエリエラーが発生しました");
+            
             return null;
         }		
         const resultData = await result.json();	
@@ -149,6 +151,9 @@ async function getWdIDsByMEse(label,limit){
  */
 function showResultORG(resultData,resultArea){
 	//クエリ結果のJSONデータを「ヘッダ部(keys)」と「値(data)」に分けて処理する
+	if(resultData==null){
+		return;
+	}
 	const keys = resultData.head.vars;
 	const data = resultData.results.bindings;
 
@@ -819,16 +824,16 @@ function setButtons(){
 	}, false);
 
     // Enterキー押下時、送信処理が実行する
-    window.document.onkeydown = function(event){
-        if (event.key === 'Enter') {
-            offset = 0;  
-			contQueryIds = false;
-			contQuery = false;
-			document.getElementById("result_div").innerHTML="";
-			contButton.style.display="none";
-			makeQuery();
-        }
-    }
+    // window.document.onkeydown = function(event){
+    //     if (event.key === 'Enter') {
+    //         offset = 0;  
+	// 		contQueryIds = false;
+	// 		contQuery = false;
+	// 		document.getElementById("result_div").innerHTML="";
+	// 		contButton.style.display="none";
+	// 		makeQuery();
+    //     }
+    // }
 
     //詳細検索表示ボタンの処理
 	showQueryCondButton.addEventListener('click', () => {

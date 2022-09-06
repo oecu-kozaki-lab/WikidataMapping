@@ -1,24 +1,19 @@
-/* 
- * 詳細検索用の条件設定
- * 　・"id"の値が重複しないように注意
- *   ・データの数は必要に応じて増減してよい． 
- */
-search_cond = 
+let search_cond = 
 [
   {
     "id": "cond1",
-    "ctext": "",
-    "cond": "",
+    "ctext": " 分類[wdt:P31] 例）wd:Q16521（タクソン），wd:Q746549（料理）",
+    "cond": "wdt:P31",
     "val": "",
-    "type": "",
+    "type": "ID",
     "const": false
   },
   {
     "id": "cond2",
-    "ctext": "",
-    "cond": "",
+    "ctext": "上位クラス 例）\twd:Q746549（料理）",
+    "cond": "wdt:P279",
     "val": "",
-    "type": "",
+    "type": "ID",
     "const": false
   },
   {
@@ -26,7 +21,7 @@ search_cond =
     "ctext": "",
     "cond": "",
     "val": "",
-    "type": "",
+    "type": "ID",
     "const": false
   },
   {
@@ -34,7 +29,7 @@ search_cond =
     "ctext": "",
     "cond": "",
     "val": "",
-    "type": "",
+    "type": "ID",
     "const": false
   },
   {
@@ -42,29 +37,24 @@ search_cond =
     "ctext": "",
     "cond": "",
     "val": "",
-    "type": "",
+    "type": "ID",
     "const": false
   }
 ];
 
-/* 
- * 検索項目の設定
- * 　・"id"の値が重複しないように注意
- *   ・データの数は必要に応じて増減してよい． 
- */
-search_prop = 
+let search_prop = 
 [
   {
     "id": "opt1",
-    "prop": "",
-    "pname": "",
-    "optional": false
+    "prop": "wdt:P31",
+    "pname": "分類",
+    "optional": true
   },
   {
     "id": "opt2",
-    "prop": "",
-    "pname": "",
-    "optional": false
+    "prop": "wdt:P279",
+    "pname": "上位クラス",
+    "optional": true
   },
   {
     "id": "opt3",

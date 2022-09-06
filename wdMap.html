@@ -84,8 +84,8 @@ async function makeQuery(){
 <textarea id="query_area" class="t_area" rows="10">
 select DISTINCT ?item ?itemLabel ?class ?super
 where{
-    BIND(?opt1 AS ?class)
-    BIND(?opt2 AS ?super)
+    {?item wdt:P31 wd:Q16521.}UNION
+    {?item wdt:P279* wd:Q2095.}   
     SERVICE wikibase:label { bd:serviceParam wikibase:language "ja,en". }
 }
 LIMIT 50		            
