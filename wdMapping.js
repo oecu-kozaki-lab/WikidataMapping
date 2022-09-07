@@ -283,4 +283,23 @@ async function makeMappingQuery_org(query,textLABEL){
    return query;
 }
 
+function downloadText(fileName, text) {
+    const blob = new Blob([text], { type: 'text/plain' });
+    const aTag = document.createElement('a');
+    aTag.href = URL.createObjectURL(blob);
+    aTag.target = '_blank';
+    aTag.download = fileName;
+    aTag.click();
+    URL.revokeObjectURL(aTag.href);
+  }
 
+function saveTable(fileName, text){
+    const head = '<!DOCTYPE html>\n<html lang="ja">\n<head>\n'+
+                '<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n'+
+                '<meta http-equiv="X-UA-Compatible" content="ie=edge">\n'+
+                '<title>Wikidataへのマッピングデータ</title>\n'+
+                '<link rel="stylesheet" href="style.css">\n</head>\n<body>\n';
+    const foot = '</body>\n</html>';
+
+    downloadText(fileName,head+text+foot);
+}
