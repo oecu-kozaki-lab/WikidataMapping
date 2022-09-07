@@ -1,7 +1,7 @@
 # WikidataMapping
 Wikdiata用のマッピングツール
 ## 汎用ツール 
-https://oecu-kozaki-lab.github.io/WikidataMapping/
+https://oecu-kozaki-lab.github.io/WikidataMapping/wdMapTool.html
 
 ## テストツール[タクソンのインスタンス or 食物のサブクラス]
 - 1エンティティ用  
