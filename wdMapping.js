@@ -7,9 +7,12 @@ async function makeMappingQuery2(query,uri,textLABEL,mode){
  
     //名称の処理
     if(textLABEL!=""){
-        conditions += 'BIND ("'+uri+'" AS ?uri)';
+        conditions += 'BIND (<'+uri+'> AS ?uri)';
         conditions += 'BIND ("'+textLABEL+'" AS ?lbl)';
-        if(mode == 'LabelFull'){
+        if(mode == 'IRI'){//「目的語が指定したIRIの時＝マッピング済み」の主語を取得する
+            conditions+= '{?item ?p <'+uri+'> .}\n';
+        }
+        else if(mode == 'LabelFull'){
             conditions+= '{?item rdfs:label|skos:altLabel "'+textLABEL+'"@ja.}\n';
             conditions+= 'UNION {?item rdfs:label|skos:altLabel "'+textLABEL+'"@en.}\n';
         }

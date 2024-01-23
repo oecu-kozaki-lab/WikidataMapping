@@ -82,10 +82,10 @@ async function makeQuery(){
         <textarea id="settings_area" class="t_area" rows="10" ></textarea><br>
         <b>置き換え前のクエリ</b>：<br>
 <textarea id="query_area" class="t_area" rows="10">
-select DISTINCT ?item ?itemLabel ?class ?super
+select DISTINCT ?item ?itemLabel ?class ?classLabel ?super ?superLabel
 where{
-    {?item wdt:P31 wd:Q16521.}UNION
-    {?item wdt:P279* wd:Q2095.}   
+    OPTIONAL{?item wdt:P31 ?class.}
+    OPTIONAL{?item wdt:P279 ?super.}   
     SERVICE wikibase:label { bd:serviceParam wikibase:language "ja,en". }
 }
 LIMIT 50		            

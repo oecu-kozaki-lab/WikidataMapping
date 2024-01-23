@@ -34,31 +34,21 @@ async function makeQuery(){
     const textLABEL = document.getElementById('LABELS').value;
    
     const labels = textLABEL.split('\n');
-    // const modes = ["LabelFull","LabelForward","LabelAmbi","IRI"];
-    let mode = "LabelFull";
-    if(document.getElementById('LabelForward').checked){
-        mode = "LabelForward";
-    }
-    else if(document.getElementById('LabelAmbi').checked){
-        mode = "LabelAmbi";
-    }
-    else if(document.getElementById('matchIRI').checked){
-        mode = "IRI";
-    }
+    const modes = ["LabelFull","LabelForward","LabelAmbi"];
 
     let num = 1;
 
     for(let i=0;i<labels.length;i++){
         const uriLbl = labels[i].split('\t');
         console.log('uri='+uriLbl[0]+'label='+uriLbl[1]+' searching...');
-        //let m=0
-        // for(m=0;m<modes.length;m++){      
+        let m=0
+        for(m=0;m<modes.length;m++){      
             if(uriLbl[1]==undefined){
                 console.log('undefinedでスキップ');
                 break;
             }
             let query = document.getElementById('query_area').value;  
-            query = await makeMappingQuery2(query,uriLbl[0],uriLbl[1],mode);
+            query = await makeMappingQuery2(query,uriLbl[0],uriLbl[1],modes[m]);
             document.getElementById('query_area2').value = query;
 
             //SPARQLクエリの実行
@@ -71,29 +61,29 @@ async function makeQuery(){
             
             if(resultData.results.bindings.length>0){
                 //showResult(resultData,resultArea); //クエリ結果の表示【テーブル表示用】
-                console.log('label='+uriLbl[1]+' mode='+mode+'...OK!');
+                console.log('label='+uriLbl[1]+' mode='+modes[m]+'...OK!');
                 showResultORG(resultData,resultArea); //クエリ結果の表示【テーブル表示用(結合無し)】
-               // break;
+                break;
             }
             //removeSearchIng();
             //console.log('label='+uriLbl[1]+' mode='+modes[m]+'...NOT FOUNDED');
-          //  if(m==2){                
-                // var new_data  =  {
-                //         "uri": {
-                //                 "value": "URI"
-                //             },
-                //             "lbl": {
-                //             "value": "TEST"
-                //             }
-                //         };
-                // new_data["uri"].value = uriLbl[0];
-                // new_data["lbl"].value = uriLbl[1];
+            if(m==2){                
+                var new_data  =  {
+                        "uri": {
+                                "value": "URI"
+                            },
+                            "lbl": {
+                            "value": "TEST"
+                            }
+                        };
+                new_data["uri"].value = uriLbl[0];
+                new_data["lbl"].value = uriLbl[1];
                 
-                // resultData.results.bindings.push(new_data);
-                // console.log('label='+uriLbl[1]+' mode='+mode+'...NOT FOUNDED...');
-                // showResultORG(resultData,resultArea); //クエリ結果の表示【テーブル表示用(結合無し)】
-        //    }  
-    
+                resultData.results.bindings.push(new_data);
+                console.log('label='+uriLbl[1]+' mode='+modes[m]+'...NOT FOUNDED...');
+                showResultORG(resultData,resultArea); //クエリ結果の表示【テーブル表示用(結合無し)】
+            }   
+        }
               
     if(((i+1) % 100 == 0 )||(i == labels.length -1)){
         let tabledata = resultArea.innerHTML;
@@ -123,17 +113,10 @@ async function makeQuery(){
         <textarea id="LABELS" class="t_area" rows="20" >
 http://xxxx	くるまえび
 http://yyyy	ブラックタイガー
-http://zzzz	ドーナツ
+http://zzzz	ドーナツ            
         </textarea><br>       
         <input type="button" id="send" value="検索の実行" style="margin-top:8px; "><br>
 	<hr>
-    <div>
-        <b>検索設定</b>:<br>
-            <label><input type="radio" id="LabelFull" name="labelType" value="full" checked>ラベル完全一致</label>
-            <label><input type="radio" id="LabelForward" name="labelType" value="forward">ラベル前方一致</label>
-            <label><input type="radio" id="LabelAmbi" name="labelType" value="ambi">ラベルあいまい検索</label>
-            <label><input type="radio" id="matchIRI" name="labelType" value="IRI">IRI一致</label>
-        </div>
         <input type="button" id="showQueryCond" value="▼詳細検索条件">
         <input type="button" id="hideQueryCond" value="△詳細検索条件" style="display:none">
         <!-- <div id="QueryCond_div" style="display:none">
@@ -157,11 +140,15 @@ http://zzzz	ドーナツ
         <textarea id="settings_area" class="t_area" rows="10" ></textarea><br> -->
         <b>置き換え前のクエリ</b>：<br>
 <textarea id="query_area" class="t_area" rows="10">
-select DISTINCT ?uri ?lbl ?item ?itemLabel ?class ?classLabel ?super ?superLabel
-where{
+select DISTINCT ?uri ?lbl ?item ?itemLabel ?class ?classLabel ?super ?superLabel ?propLabel ?prop ?o
+where{ 
 OPTIONAL{?item wdt:P31 ?class.}
 OPTIONAL{?item wdt:P279 ?super .}
-SERVICE wikibase:label { bd:serviceParam wikibase:language "ja,en". }
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "ja,en". }
+# 以下は外部IDを取得する処理
+?item ?p ?o.
+?prop wikibase:directClaim ?p.
+?prop wdt:P31/wdt:P279* wd:Q18614948.
 }
 ORDER BY ?item
 LIMIT 50             
