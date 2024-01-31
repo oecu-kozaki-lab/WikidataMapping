@@ -72,27 +72,9 @@ async function makeQuery(){
             if(resultData.results.bindings.length>0){
                 //showResult(resultData,resultArea); //クエリ結果の表示【テーブル表示用】
                 console.log('label='+uriLbl[1]+' mode='+mode+'...OK!');
-                showResultORG(resultData,resultArea); //クエリ結果の表示【テーブル表示用(結合無し)】
+                showResult(resultData,resultArea); //クエリ結果の表示【テーブル表示用(結合無し)】
                // break;
             }
-            //removeSearchIng();
-            //console.log('label='+uriLbl[1]+' mode='+modes[m]+'...NOT FOUNDED');
-          //  if(m==2){                
-                // var new_data  =  {
-                //         "uri": {
-                //                 "value": "URI"
-                //             },
-                //             "lbl": {
-                //             "value": "TEST"
-                //             }
-                //         };
-                // new_data["uri"].value = uriLbl[0];
-                // new_data["lbl"].value = uriLbl[1];
-                
-                // resultData.results.bindings.push(new_data);
-                // console.log('label='+uriLbl[1]+' mode='+mode+'...NOT FOUNDED...');
-                // showResultORG(resultData,resultArea); //クエリ結果の表示【テーブル表示用(結合無し)】
-        //    }  
     
               
     if(((i+1) % 100 == 0 )||(i == labels.length -1)){
@@ -106,6 +88,76 @@ async function makeQuery(){
 
     }  
 }
+
+
+/*
+ * クエリ結果の表示【テーブル表示用】
+ */
+ function showResult(resultData,resultArea){
+	//クエリ結果のJSONデータを「ヘッダ部(keys)」と「値(data)」に分けて処理する
+	if(resultData==null){
+		return;
+	}
+	const keys = resultData.head.vars;
+	const data = resultData.results.bindings;
+
+	removeSearchIng();
+
+	let mesText = "";
+	let orgDiv = resultArea.innerHTML;
+	if(orgDiv.indexOf("<table")>=0){
+		mesText = resultArea.innerHTML.replace("</table>","");
+	}
+	else{
+		mesText = "<table>\n<tr>" ;
+		for(let j = 0; j < keys.length; j++){
+			mesText+='<th style="background:#afeeee">'
+					+getSearchPropLabel(keys[j]) +'</th>';
+		}
+		mesText+="</tr>\n";
+	}
+
+	for(let i = 0; i < data.length; i++){
+		mesText+="<tr>";
+		
+    	for(let j = 0; j < keys.length; j++){
+			let val = "-";
+			if(data[i][keys[j]]!=null){
+				val =data[i][keys[j]].value;
+			}
+
+            // mesText += '<th>'+ val +'</th>';
+            
+            if(keys[j]=='class'||keys[j]=='super'){ //変数名が「keylink」のときは詳細表示へのリンク
+                mesText += '<th>'+getHtmlData(val)+'</th>';
+            }
+            else{
+                mesText += '<th>'+ val +'</th>';
+                // mesText += '<th>'+getHtmlData(val)+'</th>';
+            }			
+		} 
+		mesText+="</tr>";
+	}
+	resultArea.innerHTML = mesText+'</table>';
+
+	//「IDsの取得数」か「SPARQLの結果の数」がLIMITの50になった時は「続きを検索」ON
+	if(data.length == 50 || contQueryIds){
+		contQuery = true; 
+	}
+	else {
+		contQuery = false;
+	}
+
+	const contButton = document.getElementById('cont');
+	if(contQuery){ 
+        contButton.style.display="block";
+    }
+    else{
+        contButton.style.display="none";
+    }
+}
+
+
 </script>
 </head>
 
@@ -121,9 +173,9 @@ async function makeQuery(){
         1行ごとに「URI(TAB)ラベル」のテキストを貼り付けて【検索の実行】<br>
 		<!-- <input id="LABEL" type="text" value="" size="40"/>   -->
         <textarea id="LABELS" class="t_area" rows="20" >
-http://www.wikidata.org/entity/Q192783	ドーナツ
-http://www.wikidata.org/entity/Q398051	くるまえび
-http://yyyy	ブラックタイガー
+http://xxxx.org	ドーナツ
+http://yyyy.org	くるまえび
+http://zzzz.org	ブラックタイガー            
         </textarea><br>       
         <input type="button" id="send" value="検索の実行" style="margin-top:8px; "><br>
 	<hr>
